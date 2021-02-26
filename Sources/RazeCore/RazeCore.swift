@@ -28,4 +28,9 @@ public class RazeCore {
     public static var razeColor: UIColor {
         return self.colorFromHexString(hexString: "450998")
     }
+    
+    /// The second accessible color from the framework
+    public static var secondaryColor: UIColor {
+        return self.colorFromHexString(hexString: "ABCDEF")
+    }
 }

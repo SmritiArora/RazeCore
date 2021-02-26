@@ -7,6 +7,19 @@
 
 import Foundation
 
+public protocol NetworkSession {
+    func get(from url: URL, completionHandler: @escaping (Data?,Error?) -> Void )
+}
+
+extension URLSession: NetworkSession {
+    public func get(from url: URL, completionHandler: @escaping (Data?, Error?) -> Void) {
+        let task = dataTask(with: url) { data, _, error in
+            completionHandler(data, error)
+        }
+        task.resume()
+    }
+}
+
 extension RazeCore {
     public class Networking {
         /// This class will handle all network calls
@@ -14,15 +27,17 @@ extension RazeCore {
         public class Manager {
             public init() { }
             
-            private let session = URLSession.shared
+            internal var session : NetworkSession = URLSession.shared
             
+            /// Calls internet to get data to the app
+            /// - Parameters:
+            ///   - url: the place where the data resides
+            ///   - completionHandler: Returns the result object
             public func loadData(from url: URL, completionHandler: @escaping (NetworkResult<Data>) -> Void ) {
-                let task = session.dataTask(with: url) { data, response, error in
+                session.get(from: url) { (data, error) in
                     let result = data.map(NetworkResult<Data>.success) ?? .failure(error)
                     completionHandler(result)
                 }
-                
-                task.resume()
             }
         }
         public enum NetworkResult<Value> {
